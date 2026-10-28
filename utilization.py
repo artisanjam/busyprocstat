@@ -43,28 +43,30 @@ def test_utilization(deltas):
         print(UTILIZATION_WARNING.format(utilization=utilization_pct))
     return utilization_pct
 
+def sample_loop(procstat):
+    last_sample = sample_procstat(procstat)
+    sleep(SAMPLE_INTERVAL_SECONDS)
+    while True:
+        waited = 0
+        while waited < REPORT_INTERVAL_SECONDS:
+            sample = sample_procstat(procstat)
+
+            # Calculate change over two previous samples
+            deltas = get_deltas(sample, last_sample)
+            last_sample = sample
+            utilization_pct = test_utilization(deltas)
+            sleep(SAMPLE_INTERVAL_SECONDS)
+            waited += SAMPLE_INTERVAL_SECONDS
+
+        # Simplification: prints last utilization according to
+        # SAMPLE_INTERVAL_SECONDS not aggregate utilization
+        # over REPORT_INTERVAL_SECONDS
+        print(STANDARD_REPORT.format(utilization=utilization_pct))
+
 def main():
     '''Prints CPU utilization periodically.'''
     with open('/proc/stat', 'r') as procstat:
-        last_sample = sample_procstat(procstat)
-        sleep(SAMPLE_INTERVAL_SECONDS)
-        while True:
-            waited = 0
-            while waited < REPORT_INTERVAL_SECONDS:
-                sample = sample_procstat(procstat)
-
-                # Calculate change over two previous samples
-                deltas = get_deltas(sample, last_sample)
-                last_sample = sample
-                utilization_pct = test_utilization(deltas)
-                sleep(SAMPLE_INTERVAL_SECONDS)
-                waited += SAMPLE_INTERVAL_SECONDS
-
-            # Simplification: prints last utilization according to
-            # SAMPLE_INTERVAL_SECONDS not aggregate utilization
-            # over REPORT_INTERVAL_SECONDS
-            print(STANDARD_REPORT.format(utilization=utilization_pct))
-
+        sample_loop(procstat)
 
 if __name__ == '__main__':
     try:
