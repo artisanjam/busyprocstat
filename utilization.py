@@ -50,7 +50,7 @@ def sample_loop(procstat):
     sleep(SAMPLE_INTERVAL_SECONDS)
     while True:
         waited = 0
-        aggregate_deltas = [0, 0]; # usage, idle
+        aggregate_deltas = [0, 0] # usage, idle
         while waited < REPORT_INTERVAL_SECONDS:
             # Calculate change over two previous samples
             sample = sample_procstat(procstat)
