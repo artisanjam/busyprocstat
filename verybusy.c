@@ -17,10 +17,10 @@ void *busy(void *data) {
             array[i]++;
         }
     }
-    pthread_exit(NULL);
+    pthread_exit(data); // Never reached
 }
 
-int main(int argc, char *argv[]) {
+int main(void) {
     pthread_t threads[NUM_THREADS]; 
     puts(MESSAGE);
     for(int i = 0; i < NUM_THREADS; i++) {

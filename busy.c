@@ -5,7 +5,7 @@
 #define ARRAY_SIZE 1024
 #define MESSAGE "Burning CPU Cycles..."
 
-int main(int argc, char *argv[]) {
+int main(void) {
     volatile int array[ARRAY_SIZE];
 
     puts(MESSAGE);

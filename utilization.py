@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 '''Measures and reports on CPU utilization by parsing /proc/stat.'''
 from time import sleep
 
@@ -8,7 +10,7 @@ UTILIZATION_WARNING_PCT = 90
 
 # Messages
 STANDARD_REPORT = \
-        'CPU Utilization: {utilization:.2f}%'
+        'CPU Utilization: {utilization:.4f}%'
 UTILIZATION_WARNING = \
         'WARNING: CPU Utilization is {utilization:.2f}%'
 
