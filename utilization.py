@@ -50,20 +50,20 @@ def sample_loop(procstat):
     sleep(SAMPLE_INTERVAL_SECONDS)
     while True:
         waited = 0
-        aggregate_deltas = (0, 0);
+        aggregate_deltas = [0, 0]; # usage, idle
         while waited < REPORT_INTERVAL_SECONDS:
-            sample = sample_procstat(procstat)
-
             # Calculate change over two previous samples
+            sample = sample_procstat(procstat)
             deltas = get_deltas(sample, last_sample)
-            aggregate_deltas = tuple(
-                (a + b for a, b in zip(aggregate_deltas, deltas))
-            )
             last_sample = sample
-            utilization_pct = test_utilization(deltas)
+            test_utilization(deltas)
+
+            aggregate_deltas[0] += deltas[0] # Aggregate usage
+            aggregate_deltas[1] += deltas[1] # Aggregate idle
             sleep(SAMPLE_INTERVAL_SECONDS)
             waited += SAMPLE_INTERVAL_SECONDS
 
+        utilization_pct = test_utilization(aggregate_deltas)
         print(STANDARD_REPORT.format(utilization=utilization_pct))
 
 def main():
