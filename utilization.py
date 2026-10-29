@@ -5,7 +5,7 @@ from time import sleep
 
 # Configurable constants
 SAMPLE_INTERVAL_SECONDS = 1
-REPORT_INTERVAL_SECONDS = 5
+REPORT_INTERVAL_SECONDS = 3
 UTILIZATION_WARNING_PCT = 90
 
 # Messages
@@ -18,7 +18,7 @@ def sample_procstat(procstat_file):
     '''Convert total CPU usage from procstat into a tuple.'''
     line = procstat_file.readline()
     procstat_file.seek(0)
-    return [int(field) for field in line.split()[1:]]
+    return tuple( (int(field) for field in line.split()[1:]) )
 
 def get_usage_idle(fields):
     '''Return aggregate of usage and idle time in a tuple.'''
@@ -50,19 +50,20 @@ def sample_loop(procstat):
     sleep(SAMPLE_INTERVAL_SECONDS)
     while True:
         waited = 0
+        aggregate_deltas = (0, 0);
         while waited < REPORT_INTERVAL_SECONDS:
             sample = sample_procstat(procstat)
 
             # Calculate change over two previous samples
             deltas = get_deltas(sample, last_sample)
+            aggregate_deltas = tuple(
+                (a + b for a, b in zip(aggregate_deltas, deltas))
+            )
             last_sample = sample
             utilization_pct = test_utilization(deltas)
             sleep(SAMPLE_INTERVAL_SECONDS)
             waited += SAMPLE_INTERVAL_SECONDS
 
-        # Simplification: prints last utilization according to
-        # SAMPLE_INTERVAL_SECONDS not aggregate utilization
-        # over REPORT_INTERVAL_SECONDS
         print(STANDARD_REPORT.format(utilization=utilization_pct))
 
 def main():
